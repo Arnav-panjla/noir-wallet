@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noir Wallet - WebHID Bridge</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #0f3460;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #e8f4f8;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 { color: #16213e; margin-bottom: 20px; }
+        .status { padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .status.connected { background: #d4edda; color: #155724; }
+        .status.disconnected { background: #f8d7da; color: #721c24; }
+        .status.waiting { background: #fff3cd; color: #856404; }
+        button {
+            background: #0f3460;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 5px 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #16213e; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .output {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            border: 1px solid #ddd;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+        }
+        textarea { height: 100px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Noir Wallet WebHID Bridge</h1>
+
+        <div class="status disconnected" id="status">
+            Status: <strong>Disconnected</strong>
+        </div>
+
+        <div>
+            <button onclick="connectDevice()">Connect Device</button>
+            <button onclick="disconnectDevice()" id="disconnectBtn" disabled>Disconnect</button>
+            <button onclick="clearOutput()">Clear Log</button>
+        </div>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;">
+
+        <h3>Device Operations</h3>
+        <button onclick="getPublicKey()" id="pubkeyBtn" disabled>Get Public Key</button>
+        <button onclick="getStatus()" id="statusBtn" disabled>Get Status</button>
+
+        <hr style="margin: 20px 0;">
+
+        <h3>Sign Transaction</h3>
+        <div class="form-group">
+            <label>To Address:</label>
+            <input type="text" id="txTo" placeholder="0x742d35Cc6634C0532925a3b844Bc9e7595f42e55" value="0x742d35Cc6634C0532925a3b844Bc9e7595f42e55">
+        </div>
+
+        <div class="form-group">
+            <label>Value (ETH):</label>
+            <input type="text" id="txValue" placeholder="1.0" value="1.0">
+        </div>
+
+        <div class="form-group">
+            <label>Gas Price (Gwei):</label>
+            <input type="text" id="txGasPrice" placeholder="20" value="20">
+        </div>
+
+        <div class="form-group">
+            <label>Gas Limit:</label>
+            <input type="text" id="txGas" placeholder="21000" value="21000">
+        </div>
+
+        <div class="form-group">
+            <label>Data (hex):</label>
+            <input type="text" id="txData" placeholder="0x" value="0x">
+        </div>
+
+        <button onclick="signTransaction()" id="signBtn" disabled>Sign Transaction</button>
+
+        <hr style="margin: 20px 0;">
+
+        <h3>Output Log</h3>
+        <div class="output" id="output">
+            Waiting for device connection...
+        </div>
+    </div>
+
+    <script>
+        let device = null;
+
+        const log = (message, type = 'info') => {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = `[${timestamp}]`;
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            output.innerHTML += `<div class="${className}">${prefix} ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        };
+
+        const clearOutput = () => {
+            document.getElementById('output').innerHTML = '';
+        };
+
+        const updateStatus = (connected) => {
+            const statusEl = document.getElementById('status');
+            const btns = ['disconnectBtn', 'pubkeyBtn', 'statusBtn', 'signBtn'];
+
+            if (connected) {
+                statusEl.textContent = 'Status: Connected ✓';
+                statusEl.className = 'status connected';
+                btns.forEach(b => document.getElementById(b).disabled = false);
+                document.getElementById('disconnectBtn').disabled = false;
+            } else {
+                statusEl.textContent = 'Status: Disconnected ✗';
+                statusEl.className = 'status disconnected';
+                btns.forEach(b => document.getElementById(b).disabled = true);
+                document.getElementById('disconnectBtn').disabled = true;
+            }
+        };
+
+        const connectDevice = async () => {
+            try {
+                const devices = await navigator.hid.requestDevice({
+                    filters: [{vendorId: 0x2e8a}]  // Raspberry Pi Foundation
+                });
+
+                if (devices.length === 0) {
+                    log('No device selected', 'error');
+                    return;
+                }
+
+                device = devices[0];
+                await device.open();
+                log('✓ Device connected: ' + device.productName);
+                updateStatus(true);
+
+                // Listen for data
+                device.addEventListener('inputreport', onInputReport);
+            } catch (err) {
+                log(`Connection failed: ${err.message}`, 'error');
+            }
+        };
+
+        const disconnectDevice = async () => {
+            if (device) {
+                await device.close();
+                device = null;
+                log('Device disconnected');
+                updateStatus(false);
+            }
+        };
+
+        const onInputReport = (event) => {
+            const data = event.data.buffer;
+            const view = new Uint8Array(data);
+            log(`Received ${view.length} bytes: ${Array.from(view).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' ')}`);
+
+            try {
+                const decoder = new TextDecoder();
+                const json = decoder.decode(data.slice(2));
+                const parsed = JSON.parse(json);
+                log(`Response: ${JSON.stringify(parsed, null, 2)}`, 'success');
+            } catch (e) {
+                // Binary data, just show hex
+            }
+        };
+
+        const sendCommand = async (cmdByte, payload = '') => {
+            if (!device) {
+                log('Device not connected', 'error');
+                return;
+            }
+
+            try {
+                const data = new TextEncoder().encode(payload);
+                const cmd = new Uint8Array([cmdByte, data.length, ...data]);
+                await device.sendReport(0, cmd);
+                log(`Sent command 0x${cmdByte.toString(16).padStart(2, '0')} (${payload.length} bytes)`);
+            } catch (err) {
+                log(`Send failed: ${err.message}`, 'error');
+            }
+        };
+
+        const getPublicKey = async () => {
+            log('Requesting public key...');
+            await sendCommand(0x01, '');
+        };
+
+        const getStatus = async () => {
+            log('Requesting device status...');
+            await sendCommand(0x04, '');
+        };
+
+        const signTransaction = async () => {
+            const tx = {
+                nonce: 0,
+                gasPrice: String(parseInt(document.getElementById('txGasPrice').value) * 1e9),
+                gas: parseInt(document.getElementById('txGas').value),
+                to: document.getElementById('txTo').value.toLowerCase(),
+                value: String(parseFloat(document.getElementById('txValue').value) * 1e18),
+                data: document.getElementById('txData').value,
+                chainId: 1
+            };
+
+            log('Transaction to sign:', 'info');
+            log(JSON.stringify(tx, null, 2), 'info');
+            log('Sending sign request...');
+
+            const payload = JSON.stringify(tx);
+            await sendCommand(0x02, payload);
+        };
+
+        log('WebHID Bridge initialized. Click "Connect Device" to start.');
+    </script>
+</body>
+</html>
