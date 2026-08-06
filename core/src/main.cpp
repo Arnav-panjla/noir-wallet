@@ -7,10 +7,7 @@ ShrikeFlash fpga;
 void setup() {
   delay (2000);
   Serial.begin (115200);
-  while (!Serial) {
-    delay (10);
-  }
-
+  
   Serial.println ("Shrike Flash Example");
   
   // Initialize the library

@@ -43,7 +43,7 @@ Noir Wallet is a **hardware wallet** for Ethereum running on the **RP2040 microc
 ---
 
 ## See Also
-
+- [shrike platform io](https://www.circuitstate.com/tutorials/getting-started-with-vicharak-shrike-lite-rp2040-slg47910-fpga-development-board/)
 - [RP2040 Datasheet](https://datasheets.raspberrypi.com)
 - [Ethereum Signing](https://ethereum.org/en/developers)
 - [WebHID API](https://wicg.github.io/webhid)
