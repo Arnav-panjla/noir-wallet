@@ -1,18 +1,34 @@
 #include <Arduino.h>
+#include <EEPROM.h>
+#include <Shrike.h>
 
-// put function declarations here:
-int myFunction(int, int);
+ShrikeFlash fpga;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  delay (2000);
+  Serial.begin (115200);
+  while (!Serial) {
+    delay (10);
+  }
+
+  Serial.println ("Shrike Flash Example");
+  
+  // Initialize the library
+  if (!fpga.begin()) {
+    Serial.println ("Initialization failed!");
+    while (1) {
+      Serial.println ("FPGA is not running!");
+    }
+  }
+  
+  // Flash the FPGA
+  Serial.print ("Flashing FPGA..");
+  fpga.flash ("/led_blink.bin");
+  Serial.println (" Done.");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  // Your code here
+  Serial.println ("FPGA is running!");
+  delay (2000);
 }
