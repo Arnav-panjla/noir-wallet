@@ -1,0 +1,1 @@
+../../../lib/tinyusb/src/class/hid/hid_device.c

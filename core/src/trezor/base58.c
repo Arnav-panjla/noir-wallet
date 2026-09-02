@@ -1,0 +1,1 @@
+../../lib/trezor-crypto/base58.c

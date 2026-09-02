@@ -1,0 +1,1 @@
+../../lib/trezor-crypto/bip39_english.c

@@ -1,0 +1,1 @@
+../../lib/trezor-crypto/ecdsa.c
