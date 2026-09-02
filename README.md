@@ -8,6 +8,8 @@
   <strong>Secure, offline Ethereum transaction signing on STM32F401 (BlackPill)</strong>
   <br/>
   <a href="https://noirwallet.blocsoc.in">noirwallet.blocsoc.in</a>
+  <br/>
+  <br/>
 </div>
 
 ![](./assets/Schematics.png)
@@ -30,20 +32,6 @@ Noir Wallet is a **hardware wallet** for Ethereum running on the **STM32F401CCU6
 
 ---
 
-## Build
-
-<p align="center">
-  <img src="./assets/website shit/with screen attached (no buttons).jpeg" width="45%" alt="Assembled case with screen">
-  <img src="./assets/website shit/closed wallet without buttons top side.jpeg" width="45%" alt="Closed case">
-</p>
-<p align="center">
-  <img src="./assets/website shit/stm.jpeg" width="45%" alt="STM32 BlackPill board">
-  <img src="./assets/website shit/atecc.jpeg" width="45%" alt="ATECC608A secure element">
-</p>
-
-3D-printed case files live in [CAD/](./CAD) (`case_v2`, `front_pannel_v3`).
-
----
 
 ## Hardware
 
@@ -64,5 +52,4 @@ Full pinout and wiring: [schematics/HARDWARE_SPECS.md](./schematics/HARDWARE_SPE
 - [Ethereum Signing](https://ethereum.org/en/developers)
 - [WebHID API](https://wicg.github.io/webhid)
 
-**Built for BlocSoc @ University** 🚀
 
