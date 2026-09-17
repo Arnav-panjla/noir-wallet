@@ -41,8 +41,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -60,6 +60,7 @@ yarn-error.log
 *.o
 *.obj
 *.out
+/v0/core/host_test
 
 # Generated files
 *.pyc
@@ -76,3 +77,13 @@ coverage/
 # Logs
 *.log
 logs/
+
+# Private application/proposal material
+/Proposal/
+
+# LaTeX intermediates (keep source PDFs)
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
