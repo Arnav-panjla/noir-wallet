@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/status-research%20prototype-yellow" alt="Status: research prototype">
   <img src="https://img.shields.io/badge/firmware-C-blue" alt="Firmware: C">
   <img src="https://img.shields.io/badge/V0-STM32F401%20%2B%20ATECC608A-orange" alt="V0 hardware">
+  <img src="https://img.shields.io/badge/V1-STM32F411%20%2B%20SE050C2-green" alt="V1 hardware">
   <br/>
   <strong>Open hardware-wallet research from Blockchain Society, IIT Delhi</strong>
   <br/>
@@ -28,6 +29,8 @@
 │   ├── assets/        # V0 photographs and diagrams
 │   └── publication/   # Public V0 research paper and images
 ├── v1/
+│   ├── PCB/           # KiCad project (wallet_v1): schematic, symbols, ERC
+│   ├── assets/        # V1 CAD, schematic and PCB visualization images
 │   └── publication/   # Public V1 architecture/security research
 ├── Proposal/          # Local competition material; ignored by Git
 ├── LICENSE
@@ -54,16 +57,51 @@ V0 as research prototype, not production wallet.
 - [Ledger N3XT paper source](./v0/publication/paper.tex)
 - [Ledger N3XT paper PDF](./v0/publication/paper.pdf)
 
-## V1: hardened architecture research
+## Status
 
-V1 targets non-exportable secp256k1 signing, protected
-MCU-to-secure-element communication, secure boot, explicit transaction
-confirmation, and smaller custom SMD PCB.
+| Version | State |
+| --- | --- |
+| V0 | Working research prototype (STM32F401 + ATECC608A, hand-wired) |
+| V1 schematic | Done: KiCad 10, ERC 0 errors / 0 warnings |
+| V1 PCB layout | In progress; routed `.kicad_pcb` not yet published |
+| V1 enclosure | Fusion CAD model done (top cover + bottom case) |
+| V1 firmware | Not started on V1 hardware; V0 UI and USB code to be reused |
 
-Current recommendation: evaluate NXP EdgeLock SE051C2 first, Microchip TA101
-as fallback. Both support secp256k1 for Ethereum and Monad; configured
-variants also provide Ed25519 paths for possible Solana support. Secure-element
-choice does not independently solve compromised MCU or OLED substitution.
+## V1: custom pendrive-format board
+
+V1 redesigns the electronics as one 75 x 30 mm 4-layer PCB with a USB-C plug,
+targeting non-exportable secp256k1 signing, protected MCU-to-secure-element
+communication, and explicit on-device transaction review.
+
+Hardware, per the KiCad schematic in [`v1/PCB/wallet_v1`](./v1/PCB/wallet_v1/):
+
+- MCU: STM32F411CEU6 (QFN-48), bridge MCU; hardened path is an STM32U5-class part
+- Secure element: NXP SE050C2HQ1 (HX2QFN20), SCP03 secure channel
+- USB-C plug (USB 2.0), USBLC6-2SC6 ESD protection, AP2112K-3.3 LDO
+- 128x64 OLED header, 5 UI buttons, reset, SWD header
+
+Known caveats: OLED and SE050C2 share I2C1, so display data is visible on the
+bus while SE payloads are SCP03-protected. U4 still needs a custom HX2QFN20
+footprint.
+
+### Photos
+
+| | |
+| --- | --- |
+| ![Fusion CAD](./v1/assets/CAD_ui.png) | ![KiCad schematic](./v1/assets/kicad_schematics.png) |
+| Fusion model: Top_Cover and Bottom_Case | KiCad schematic `wallet_v1.kicad_sch` |
+| ![PCB layout visualization](./v1/assets/kicad_pcb_collage.png) | ![Top and bottom board visualization](./v1/assets/top_and_bottom_pcb.png) |
+| PCB layout visualization, 75 x 30 mm | Top and bottom board visualization |
+
+PCB images are layout visualizations of the target board, not fabricated
+hardware. Part marks in the renders are illustrative; the schematic is the
+source of truth.
+
+### V1 research
+
+Secure-element evaluation recommends NXP EdgeLock SE051C2 first and Microchip
+TA101 as fallback. Secure-element choice does not independently solve a
+compromised MCU or OLED substitution.
 
 - [Secure-element report source](./v1/publication/secure-element-report.tex)
 - [Secure-element report PDF](./v1/publication/secure-element-report.pdf)
@@ -113,6 +151,7 @@ pdflatex -interaction=nonstopmode -halt-on-error secure-element-report.tex
 - [Noir Wallet](https://noirwallet.blocsoc.in)
 - [Published paper](https://noirwallet.blocsoc.in/paper)
 - [GitHub](https://github.com/Arnav-panjla/noir-wallet)
+- [NXP SE050 data sheet](https://www.nxp.com/products/SE050)
 - [STM32F401CC data sheet](https://www.st.com/resource/en/datasheet/stm32f401cc.pdf)
 - [NXP EdgeLock SE051 data sheet](https://www.nxp.com/docs/en/data-sheet/SE051.pdf)
 
