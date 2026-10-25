@@ -14,9 +14,9 @@
   <br/>
 </div>
 
-![Noir Wallet V0 architecture](./v0/assets/Schematics.png)
+![Noir Wallet V0 architecture](./v1/assets/exploded_view.png)
 
----
+## ![Top and bottom board visualization](./v1/assets/top_back_view.png)
 
 ## Repository layout
 
@@ -59,13 +59,13 @@ V0 as research prototype, not production wallet.
 
 ## Status
 
-| Version | State |
-| --- | --- |
-| V0 | Working research prototype (STM32F401 + ATECC608A, hand-wired) |
-| V1 schematic | Done: KiCad 10, ERC 0 errors / 0 warnings |
-| V1 PCB layout | In progress; routed `.kicad_pcb` not yet published |
-| V1 enclosure | Fusion CAD model done (top cover + bottom case) |
-| V1 firmware | Not started on V1 hardware; V0 UI and USB code to be reused |
+| Version       | State                                                          |
+| ------------- | -------------------------------------------------------------- |
+| V0            | Working research prototype (STM32F401 + ATECC608A, hand-wired) |
+| V1 schematic  | Done: KiCad 10, ERC 0 errors / 0 warnings                      |
+| V1 PCB layout | In progress; routed `.kicad_pcb` not yet published             |
+| V1 enclosure  | Fusion CAD model done (top cover + bottom case)                |
+| V1 firmware   | Not started on V1 hardware; V0 UI and USB code to be reused    |
 
 ## V1: custom pendrive-format board
 
@@ -86,16 +86,10 @@ footprint.
 
 ### Photos
 
-| | |
-| --- | --- |
-| ![Fusion CAD](./v1/assets/CAD_ui.png) | ![KiCad schematic](./v1/assets/kicad_schematics.png) |
-| Fusion model: Top_Cover and Bottom_Case | KiCad schematic `wallet_v1.kicad_sch` |
-| ![PCB layout visualization](./v1/assets/kicad_pcb_collage.png) | ![Top and bottom board visualization](./v1/assets/top_and_bottom_pcb.png) |
-| PCB layout visualization, 75 x 30 mm | Top and bottom board visualization |
-
-PCB images are layout visualizations of the target board, not fabricated
-hardware. Part marks in the renders are illustrative; the schematic is the
-source of truth.
+![Fusion CAD](./v1/assets/CAD_ui.png)
+![KiCad schematic](./v1/assets/kicad_schematics.png)
+![PCB layout visualization](./v1/assets/kicad_pcb_collage.png)
+![Top and bottom board visualization](./v1/assets/top_and_bottom_pcb.png)
 
 ### V1 research
 
@@ -128,24 +122,6 @@ make
 ./host_test
 ```
 
-## Build publications
-
-V0 paper:
-
-```bash
-cd v0/publication
-pdflatex -interaction=nonstopmode -halt-on-error paper.tex
-pdflatex -interaction=nonstopmode -halt-on-error paper.tex
-```
-
-V1 secure-element report:
-
-```bash
-cd v1/publication
-pdflatex -interaction=nonstopmode -halt-on-error secure-element-report.tex
-pdflatex -interaction=nonstopmode -halt-on-error secure-element-report.tex
-```
-
 ## Links
 
 - [Noir Wallet](https://noirwallet.blocsoc.in)
@@ -159,5 +135,3 @@ pdflatex -interaction=nonstopmode -halt-on-error secure-element-report.tex
 
 See [LICENSE](./LICENSE). Vendored dependencies retain their own notices and
 licenses.
-
-
